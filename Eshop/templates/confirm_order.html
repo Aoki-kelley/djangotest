@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirm Order</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+          crossorigin="anonymous">
+</head>
+<body>
+<p>
+    <img src="{{ goods.image.url }}" alt="无法显示" height="120" width="74.2">
+    <br/>
+    卖家:<span style="color: #3399ff">{{ seller }}</span>
+    <br/>
+    商品名:
+    <span style="color: #3399ff">{{ goods.title }}</span>
+    <br/>
+    单价:<span style="color: #3399ff">{{ goods.price }}</span>
+    库存:<span style="color: #3399ff">{{ goods.amount }}</span>
+</p>
+<p>商品描述:</p>
+<table border="1">
+    <tr>
+        <td>
+            {% autoescape off %}
+                {{ goods.detail }}
+            {% endautoescape %}
+        </td>
+    </tr>
+</table>
+<form action="/trade/order/{{ goods.id }}/" name="OrderGoods" method="post">
+    {% csrf_token %}
+    <p>
+        数量:{{ form.number }}
+    </p>
+    <button type="submit">
+        确定
+    </button>
+</form>
+{% if too_larger %}
+    <p>库存不足</p>
+{% elif money_not_enough %}
+    <p>余额不足</p>
+{% elif seller_off %}
+    <p style="color: red">卖家账户已被冻结，无法下单</p>
+{% elif wrong %}
+    <p>请检查输入</p>
+{% endif %}
+</body>
+</html>

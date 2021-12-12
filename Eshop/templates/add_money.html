@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Money</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+          crossorigin="anonymous">
+</head>
+<body>
+<p style="text-align: right">
+    <a href="/user/mine/">返回</a>
+</p>
+<p style="text-align: center">
+    用户名:
+    <span style="color: dodgerblue">
+        {{ user.username }}
+    </span>
+    当前金额:
+    <span style="color: dodgerblue">
+        {{ user.money }}
+    </span>
+</p>
+<form name="AddMoney" action="/user/add_money/" method="post" style="text-align: center">
+    {% csrf_token %}
+    <p>
+        充值金额{{ form.money }}
+    </p>
+    <button type="submit">
+        确定
+    </button>
+</form>
+{% if error %}
+    <p style="text-align: center">
+        请检查数值
+    </p>
+{% endif %}
+<p style="text-align: center;color: darkgrey">
+    金额应小于等于10000，大于等于10之间，且小数位不多于两位。
+</p>
+</body>
+</html>

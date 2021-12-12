@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Forget Password</title>
+</head>
+<body>
+<form method="post" name="ForgetPwd" action="/user/forget_pwd/">
+    {% csrf_token %}
+    <p style="text-align: center">
+        用户名:{{ form.username }}
+        <br/>
+        邮箱:{{ form.email }}
+        <br/>
+        <button type="submit">确定</button>
+    </p>
+</form>
+{% if wrong %}
+    <p style="text-align: center">
+        请检查输入。
+    </p>
+{% endif %}
+</body>
+</html>
