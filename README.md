@@ -2,7 +2,7 @@
 
 ------------
 
-## 项目：电商平台(Eshop)
+## 项目：电商平台([Eshop](https://github.com/Aoki-kelley/djangotest/tree/eshop))
 
 *utf-8,python3.9*
 
