@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect
 from django.core.paginator import Paginator
 
 from trade.models import Goods
+from trade.forms import SearchGoods
 from user.models import User, VerificationCode
 from user.tasks import SendEmailTask
 
@@ -35,7 +36,7 @@ def home(req):
     username = req.COOKIES.get('is_login')
     if username is not None and User.objects.filter(username__exact=username, status='on'):
         user = User.objects.filter(username__exact=username, status='on')[0]
-        data.update({'is_login': 'is_login', 'image': user.image})
+        data.update({'is_login': 'is_login', 'image': user.image, 'form': SearchGoods()})
     return render(req, 'home.html', data)
 
 

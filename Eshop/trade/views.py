@@ -3,9 +3,14 @@ import datetime
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
+import comment.forms
+from comment.models import Comment
 from trade.models import *
 from trade.forms import *
 from user.forms import *
+
+labels = [(1, '小说'), (2, '文学'), (3, '艺术'), (4, '动漫/幽默'), (5, '娱乐时尚'),
+          (6, '旅游'), (7, '地图/地理'), (8, '科学技术')]
 
 
 def raise_wrong(req):  # 错误挂起
@@ -41,7 +46,7 @@ def mien_goods(req):
 
 def goods_create(req):  # 商品创建
     username = req.COOKIES.get('is_login')
-    if username is not None:
+    if username is not None and User.objects.filter(username__exact=username, role='seller', status='on'):
         data = {'form': CreateGoods()}
         if req.method == 'POST':
             uf = CreateGoods(req.POST, req.FILES)
@@ -53,9 +58,7 @@ def goods_create(req):  # 商品创建
                 price = uf.cleaned_data['price']
                 amount = uf.cleaned_data['amount']
                 date_now = datetime.datetime.now()
-                user = User.objects.filter(username__exact=username, status='on')[0]
-                labels = [(1, '小说'), (2, '文学'), (3, '艺术'), (4, '动漫/幽默'), (5, '娱乐时尚'),
-                          (6, '旅游'), (7, '地图/地理'), (8, '科学技术')]
+                user = User.objects.filter(username__exact=username, role='seller', status='on')[0]
                 # print(uf.cleaned_data)
                 last_goods = Goods.objects.last()
                 if last_goods is None:
@@ -87,7 +90,7 @@ def change_goods(req, gid):
         return raise_wrong(req)
     else:
         username = req.COOKIES.get('is_login')
-        if username is not None:
+        if username is not None and User.objects.filter(username__exact=username, role='seller', status='on'):
             target = Goods.objects.filter(id=gid)
             if req.method == 'POST':
                 detail = req.POST.get('detail')
@@ -128,7 +131,7 @@ def down_goods(req, gid):
         return raise_wrong(req)
     else:
         username = req.COOKIES.get('is_login')
-        if username is not None:
+        if username is not None and User.objects.filter(username__exact=username, role='seller', status='on'):
             target = Goods.objects.filter(id=gid)
             if target:
                 goods = target[0]
@@ -147,7 +150,7 @@ def up_goods(req, gid):
         return raise_wrong(req)
     else:
         username = req.COOKIES.get('is_login')
-        if username is not None:
+        if username is not None and User.objects.filter(username__exact=username, role='seller', status='on'):
             target = Goods.objects.filter(id=gid)
             if target:
                 goods = target[0]
@@ -170,11 +173,13 @@ def goods_detail(req, gid):
             user = User.objects.filter(username__exact=username, status='on')[0]
             target = Goods.objects.filter(id=gid)
             seller = User.objects.filter(id=target[0].seller_id)[0]
+            comments = Comment.objects.filter(goods=gid).order_by('-date')
             in_wish = list(Wish.objects.filter(user_id=user.id, goods=gid))
             # print(list(in_wish))
             if target:
                 goods = target[0]
-                data = {'goods': goods, 'user': user, 'seller': seller.username, 'in_wish': in_wish}
+                data = {'goods': goods, 'user': user, 'seller': seller.username,
+                        'comments': comments, 'form': comment.forms.LeaveComment()}
                 if in_wish:
                     data.update({'in_wish': 'in_wish'})
                 return render(req, 'detail_goods.html', data)
@@ -191,8 +196,11 @@ def wish(req, gid):
     else:
         username = req.COOKIES.get('is_login')
         if username is not None and User.objects.filter(username__exact=username, status='on', role='buyer'):
-            user = User.objects.filter(username__exact=username, status='on', role='buyer')[0]
-            goods = Goods.objects.filter(id=gid)[0]
+            try:
+                user = User.objects.filter(username__exact=username, status='on', role='buyer')[0]
+                goods = Goods.objects.filter(id=gid)[0]
+            except IndexError:
+                return raise_wrong(req)
             Wish.objects.create(user_id=user.id, goods=gid, seller=goods.seller.id, date=datetime.datetime.now())
             return redirect('/trade/goods_detail/{gid}/'.format(gid=gid))
         else:
@@ -260,7 +268,7 @@ def order(req, gid):
                                     Order.objects.create(goods=goods.id, title=goods.title, seller=seller.id,
                                                          buyer=buyer.id, date=datetime.datetime.now(), amount=number,
                                                          price=goods.price, status='not_deal')
-                                    buyer.money -= goods.price * number
+                                    buyer.money -= round(float(goods.price * number), 2)
                                     buyer.save()
                                     return redirect('/trade/mine_order/')
                     else:
@@ -285,13 +293,6 @@ def mine_order(req):
                 return raise_wrong(req)
             data = {'order_list': [], 'buyer_role': 'buyer_role'}
             orders = Order.objects.filter(buyer=buyer.id)
-            if not list(orders):
-                return render(req, 'mine_order.html')
-            else:
-                for od in orders:
-                    goods = Goods.objects.filter(id=od.goods)[0]
-                    data['order_list'].append((goods, od))
-                return render(req, 'mine_order.html', data)
         else:
             try:
                 seller = User.objects.filter(username__exact=username, status='on', role='seller')[0]
@@ -299,43 +300,100 @@ def mine_order(req):
                 return raise_wrong(req)
             data = {'order_list': [], 'seller_role': 'seller_role'}
             orders = Order.objects.filter(seller=seller.id)
-            if not list(orders):
-                return render(req, 'mine_order.html')
-            else:
-                for od in orders:
-                    goods = Goods.objects.filter(id=od.goods)[0]
-                    data['order_list'].append((goods, od))
+        if not list(orders):
+            return render(req, 'mine_order.html')
+        else:
+            for od in orders:
+                goods = Goods.objects.filter(id=od.goods)[0]
+                data['order_list'].append((goods, od))
                 return render(req, 'mine_order.html', data)
     else:
         data = {'login_no': 'login_no', 'form': UserLog()}
         return render(req, 'login.html', data)
 
 
-def deal_order(req, oid):
-    username = req.COOKIES.get('is_login')
-    if username is not None and User.objects.filter(username__exact=username, status='on'):
-        user = User.objects.filter(username__exact=username, status='on')[0]
-        if user.role == 'buyer':
-            try:
-                od = Order.objects.filter(id=oid)[0]
-                seller = User.objects.filter(id=od.seller, status='on', role='seller')[0]
-                goods = Goods.objects.filter(id=od.goods)[0]
-            except IndexError:
-                return raise_wrong(req)
-            od.status = 'off'
-            od.save()
-            goods.amount -= od.amount
-            goods.save()
-            seller.money += float(od.amount * od.price)
-            return redirect('/trade/mine_order/')
-        else:
-            try:
-                od = Order.objects.filter(id=oid)[0]
-            except IndexError:
-                return raise_wrong(req)
-            od.status = 'on'
-            od.save()
-            return redirect('/trade/mine_order/')
+def deal_order(req, oid, action='accept'):
+    if not oid.isdigit():
+        return raise_wrong(req)
     else:
-        data = {'login_no': 'login_no', 'form': UserLog()}
-        return render(req, 'login.html', data)
+        username = req.COOKIES.get('is_login')
+        if username is not None and User.objects.filter(username__exact=username, status='on'):
+            user = User.objects.filter(username__exact=username, status='on')[0]
+            if user.role == 'buyer':
+                try:
+                    od = Order.objects.filter(id=oid)[0]
+                    seller = User.objects.filter(id=od.seller, status='on', role='seller')[0]
+                    goods = Goods.objects.filter(id=od.goods)[0]
+                except IndexError:
+                    return raise_wrong(req)
+                if action == 'accept':
+                    od.status = 'off'
+                    od.save()
+                    goods.amount -= od.amount
+                    goods.save()
+                    if goods.amount == 0:
+                        goods.status = 'off'
+                        goods.save()
+                    seller.money += round(float(od.amount * od.price, ), 2)
+                    seller.save()
+                    return redirect('/trade/mine_order/')
+                elif action == 'cancel':
+                    od.status = 'b_cancel'
+                    od.save()
+                    user.money += round(float(od.amount * od.price), 2)
+                    user.save()
+                    return redirect('/trade/mine_order/')
+                else:
+                    return raise_wrong(req)
+            else:
+                try:
+                    od = Order.objects.filter(id=oid)[0]
+                    buyer = User.objects.filter(id=od.buyer, status='on', role='buyer')[0]
+                    goods = Goods.objects.filter(id=od.goods)[0]
+                except IndexError:
+                    return raise_wrong(req)
+                if action == 'accept':
+                    if od.status == 'not_deal':
+                        od.status = 'on'
+                        od.save()
+                        goods.amount -= od.amount
+                        goods.save()
+                        if goods.amount == 0:
+                            goods.status = 'off'
+                            goods.save()
+                    return redirect('/trade/mine_order/')
+                elif action == 'cancel':
+                    od.status = 's_cancel'
+                    od.save()
+                    buyer.money += round(float(od.amount * od.price), 2)
+                    buyer.save()
+                    return redirect('/trade/mine_order/')
+                else:
+                    return raise_wrong(req)
+        else:
+            data = {'login_no': 'login_no', 'form': UserLog()}
+            return render(req, 'login.html', data)
+
+
+def search(req):
+    if req.method == 'GET':
+        return raise_wrong(req)
+    else:
+        username = req.COOKIES.get('is_login')
+        if username is not None and User.objects.filter(username__exact=username, status='on'):
+            uf = SearchGoods(req.POST)
+            if uf.is_valid():
+                label = uf.cleaned_data['label']
+                lb = labels[int(label) - 1][1]
+                results = Goods.objects.filter(label=lb, status='on')
+                data = {'form': SearchGoods()}
+                print(results)
+                if results:
+                    data['results'] = results
+                    data['length'] = len(results)
+                return render(req, 'search.html', data)
+            else:
+                return redirect('/')
+        else:
+            data = {'login_no': 'login_no', 'form': UserLog()}
+            return render(req, 'login.html', data)

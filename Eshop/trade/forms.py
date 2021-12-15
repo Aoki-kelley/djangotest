@@ -10,10 +10,10 @@ class CreateGoods(forms.ModelForm):
     # image = forms.fields.ImageField(required=True)
     # title = forms.fields.CharField(required=True, max_length=16)
     # detail = forms.fields.CharField(widget=forms.Textarea, required=True)
-    label = forms.fields.ChoiceField(required=True, choices=choices)
-
     # price = forms.fields.FloatField(required=True)
     # amount = forms.fields.IntegerField(required=True)
+    label = forms.fields.ChoiceField(required=True, choices=choices)
+
     class Meta:
         fields = ['image', 'title', 'detail', 'price', 'amount']
         model = Goods
@@ -30,3 +30,7 @@ class ChangeGoods(forms.ModelForm):
 
 class OrderGoods(forms.Form):
     number = forms.fields.IntegerField(required=False)
+
+
+class SearchGoods(forms.Form):
+    label = forms.fields.ChoiceField(required=True, choices=choices)

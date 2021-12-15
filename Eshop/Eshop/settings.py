@@ -137,20 +137,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 MEDIA_URL = "/media/"
-
+# 图像验证码格式，可以自定义。
 CAPTCHA_OUTPUT_FORMAT = u'%(text_field)s  %(image)s %(hidden_field)s'
-
+# 添加干扰点、干扰线
 CAPTCHA_NOISE_FUNCTIONS = (
     'captcha.helpers.noise_null',
-    'captcha.helpers.noise_arcs',  # 干扰线
-    # 'captcha.helpers.noise_dots',  # 干扰点
+    'captcha.helpers.noise_arcs',
+    # 'captcha.helpers.noise_dots',
 )
 
 CAPTCHA_IMAGE_SIZE = (100, 25)
 
 CAPTCHA_BACKGROUND_COLOR = '#ffffff'
 
-CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.random_char_challenge'  # 随机字符
+CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.random_char_challenge'
 
 CAPTCHA_LENGTH = 4
 
@@ -158,7 +158,7 @@ CAPTCHA_TIMEOUT = 3
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-EMAIL_HOST = 'smtp.163.com'
+EMAIL_HOST = ''
 
 EMAIL_PORT = 25
 

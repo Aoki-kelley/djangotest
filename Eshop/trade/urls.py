@@ -20,5 +20,6 @@ urlpatterns = [
     path('order/<gid>/', views.order, name='order'),
     path('mine_order/', views.mine_order, name='mine_order'),
     path('deal_order/', views.raise_wrong, name='deal_order_wrong'),
-    path('deal_order/<oid>/', views.deal_order, name='deal_order'),
+    path('deal_order/<oid>&<action>/', views.deal_order, name='deal_order'),
+    path('search/', views.search, name='search')
 ]

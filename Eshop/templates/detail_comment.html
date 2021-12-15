@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Detail</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+          crossorigin="anonymous">
+</head>
+<body>
+<p style="text-align: right">
+    <a href="/trade/goods_detail/{{ goods.id }}/">返回</a>
+    <img src="{{ user.image.url }}" alt="无法显示" height="48" width="48"/>
+</p>
+<table align="center" class="table table-striped table-bordered table-hover">
+    <tr>
+        <td>标题</td>
+        <td>{{ comment.title }}</td>
+        <td>评论时间</td>
+        <td>{{ comment.date|date:'Y-m-d H:i' }}</td>
+    </tr>
+</table>
+<table align="center" class="table table-striped table-bordered table-hover">
+    <tr>
+        <td>内容</td>
+    </tr>
+    <tr>
+        <td>{{ comment.content }}</td>
+    </tr>
+</table>
+<form name="LeaveReply" action="/comment/reply_comment/{{ cid }}/" method="post" style="text-align: center">
+    {% csrf_token %}
+    <p>
+        回复内容:
+    </p>
+    {{ form.content }}
+    <button type="submit">确定</button>
+</form>
+{% if replies %}
+    <table align="center" class="table table-striped table-bordered table-hover">
+    {% for reply,from_user,to_user in replies %}
+        {% if reply.floor == -1 %}
+            <tr>
+                <td width="45">
+                    <img src="{{ from_user.image.url }}" alt="无法显示" width="30" height="30">
+                    {{ from_user.username }}
+                </td>
+                <td width="80">商家回复</td>
+                <td width="100">{{ reply.content }}</td>
+                {% if user.id == goods.seller.id or user.role == 'buyer' %}
+                    <td width="80"><a href="/comment/reply_reply/{{ reply.id }}/">回复</a></td>
+                {% endif %}
+            </tr>
+        {% elif reply.floor == 0 %}
+            <tr>
+                <td width="45">
+                    <img src="{{ from_user.image.url }}" alt="无法显示" width="30" height="30">
+                    {{ from_user.username }}
+                </td>
+                <td width="80">{{ from_user.username }}回复</td>
+                <td>{{ reply.content }}</td>
+                {% if user.id == goods.seller.id or user.role == 'buyer' %}
+                    <td width="80"><a href="/comment/reply_reply/{{ reply.id }}/">回复</a></td>
+                {% endif %}
+            </tr>
+        {% elif reply.floor == 2 %}
+            <tr>
+                <td width="45">
+                    <img src="{{ from_user.image.url }}" alt="无法显示" width="30" height="30">
+                    {{ from_user.username }}
+                </td>
+                <td width="80">{{ from_user.username }}(商家)回复{{ to_user.username }}</td>
+                <td>{{ reply.content }}</td>
+                {% if user.id == goods.seller.id or user.role == 'buyer' %}
+                    <td width="80"><a href="/comment/reply_reply/{{ reply.id }}/">回复</a></td>
+                {% endif %}
+            </tr>
+        {% elif reply.floor == 1 %}
+            <tr>
+                <td width="45">
+                    <img src="{{ from_user.image.url }}" alt="无法显示" width="30" height="30">
+                    {{ from_user.username }}
+                </td>
+                <td width="80">{{ from_user.username }}回复{{ to_user.username }}</td>
+                <td>{{ reply.content }}</td>
+                {% if user.id == goods.seller.id or user.role == 'buyer' %}
+                    <td width="80"><a href="/comment/reply_reply/{{ reply.id }}/">回复</a></td>
+                {% endif %}
+            </tr>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <p style="text-align: center">还没有评论</p>
+{% endif %}
+</table>
+</body>
+</html>

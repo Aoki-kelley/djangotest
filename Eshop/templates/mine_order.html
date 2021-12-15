@@ -17,7 +17,7 @@
         <tr>
             <td>图片</td>
             <td>商品名</td>
-            <td>成交价</td>
+            <td>成交价(元)</td>
             <td>数量</td>
             <td>下单时间</td>
             <td>状态</td>
@@ -36,20 +36,27 @@
                     {% if order.status == 'on' %}
                         卖家已发货
                     {% elif order.status == 'not_deal' %}
-                        等待卖家发货
+                        等待卖家处理
                     {% elif order.status == 'off' %}
                         已结束
+                    {% elif order.status == 'b_cancel' %}
+                        买家已取消订单
+                    {% elif order.status == 's_cancel' %}
+                        卖家已拒绝订单
                     {% endif %}
                 </td>
                 <td>
                     <a href="/trade/goods_detail/{{ goods.id }}/">查看商品</a>
                     {% if seller_role %}
                         {% if order.status == 'not_deal' %}
-                            <a href="/trade/deal_order/{{ order.id }}/">发货</a>
+                            <a href="/trade/deal_order/{{ order.id }}&accept/">发货</a>
+                            <a href="/trade/deal_order/{{ order.id }}&cancel/">拒绝订单</a>
                         {% endif %}
                     {% elif buyer_role %}
                         {% if order.status == 'on' %}
-                            <a href="/trade/deal_order/{{ order.id }}/">确认收货</a>
+                            <a href="/trade/deal_order/{{ order.id }}&accept/">确认收货</a>
+                        {% elif order.status == 'not_deal' %}
+                            <a href="/trade/deal_order/{{ order.id }}&cancel/">取消订单</a>
                         {% endif %}
                     {% endif %}
                 </td>

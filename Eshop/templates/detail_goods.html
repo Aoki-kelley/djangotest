@@ -24,7 +24,7 @@
     标签:
     <span style="color: #3399ff">{{ goods.label }}</span>
     <br/>
-    单价:<span style="color: #3399ff">{{ goods.price }}</span>
+    单价:<span style="color: #3399ff">{{ goods.price }}</span>元
     库存:<span style="color: #3399ff">{{ goods.amount }}</span>
 </p>
 <p>商品描述:</p>
@@ -41,15 +41,52 @@
 {% if goods.status == 'on' %}
     {% if user.role == 'buyer' %}
         {% if in_wish %}
-            <p>已收藏</p>
+            <p style="color: #ffb53a">已收藏</p>
         {% else %}
             <button>
                 <a href="/trade/wish/{{ goods.id }}/">收藏</a>
             </button>
         {% endif %}
+        <form name="LeaveComment" action="/comment/leave_comment/{{ goods.id }}/" method="post">
+            {% csrf_token %}
+            评论标题:{{ form.title }}
+            <br/>
+            <p>
+                评论内容:
+            </p>
+            {{ form.content }}
+            <button type="submit">确定</button>
+        </form>
     {% endif %}
 {% elif goods.status == 'off' %}
     <p style="color: indianred">该商品已下架</p>
+{% endif %}
+{% if comments %}
+    <table align="center" class="table table-striped table-bordered table-hover">
+        {% for comment in comments %}
+            <thead>
+            <tr>
+                <td>评论者</td>
+                <td>标题</td>
+                <td>时间</td>
+                {% if user.role == 'seller' and user.id == goods.seller.id %}
+                    <td></td>
+                {% endif %}
+            </tr>
+            </thead>
+            <tr>
+                <td width="75">
+                    <img src="{{ comment.user.image.url }}" alt="无法显示" width="30" height="30">
+                    {{ comment.user.username }}
+                </td>
+                <td>{{ comment.title }}</td>
+                <td width="150">{{ comment.date|date:'Y-m-d H:i' }}</td>
+                {% if user.role == 'seller' and user.id == goods.seller.id %}
+                    <td width="45"><a href="/comment/comment_detail/{{ comment.id }}/">查看</a></td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
 {% endif %}
 </body>
 </html>

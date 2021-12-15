@@ -27,5 +27,6 @@ urlpatterns = [
     path('captcha/', include('captcha.urls')),
     path('tinymce/', include('tinymce.urls')),
     path('trade/', include(('trade.urls', 'trade'), namespace='trade')),
+    path('comment/', include(('comment.urls', 'comment'), namespace='comment')),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

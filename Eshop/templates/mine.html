@@ -33,18 +33,24 @@
         {{ user.email }}
     </span>
 </p>
-<br/>
-{% if user.role == 'buyer' %}
-    <p style="text-align:center">
+<p style="text-align:center">
+    {% if user.role == 'buyer' %}
         余额:
         <span style="color: dodgerblue">
         {{ user.money }}
-        </span>
+        </span>元
         <button>
             <a href="/user/add_money/">充值</a>
         </button>
-    </p>
-    <br/>
+    {% elif user.role == 'seller' %}
+        交易额:
+        <span style="color: dodgerblue">
+        {{ user.money }}
+        </span>元
+    {% endif %}
+</p>
+<br/>
+{% if user.role == 'buyer' %}
     <p style="text-align: center">
         <button>
             <a href="/trade/mine_wish/">我的收藏</a>
@@ -53,21 +59,19 @@
             <a href="/trade/mine_order/">我的订单</a>
         </button>
         <button>
-            <a href="/user/mine/">我的评价</a>
+            <a href="/comment/mine_comment_reply/">我的评价和回复</a>
         </button>
     </p>
 {% elif user.role == 'seller' %}
     <p style="text-align: center">
-        交易额:
-        <span style="color: dodgerblue">
-        {{ user.money }}
-        </span>
-        <br/>
         <button>
             <a href="/trade/mine_goods/">我的在售</a>
         </button>
         <button>
             <a href="/trade/mine_order/">我的订单</a>
+        </button>
+        <button>
+            <a href="/comment/mine_comment_reply/">我的回复</a>
         </button>
     </p>
 {% endif %}
