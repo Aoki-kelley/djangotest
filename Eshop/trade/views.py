@@ -175,6 +175,7 @@ def goods_detail(req, gid):
             seller = User.objects.filter(id=target[0].seller_id)[0]
             comments = Comment.objects.filter(goods=gid).order_by('-date')
             in_wish = list(Wish.objects.filter(user_id=user.id, goods=gid))
+            bought = list(Order.objects.filter(goods=gid, buyer=user.id, status='off'))
             # print(list(in_wish))
             if target:
                 goods = target[0]
@@ -182,6 +183,8 @@ def goods_detail(req, gid):
                         'comments': comments, 'form': comment.forms.LeaveComment()}
                 if in_wish:
                     data.update({'in_wish': 'in_wish'})
+                if bought:
+                    data.update({'bought': 'bought'})
                 return render(req, 'detail_goods.html', data)
             else:
                 return raise_wrong(req)

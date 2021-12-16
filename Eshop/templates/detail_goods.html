@@ -47,16 +47,20 @@
                 <a href="/trade/wish/{{ goods.id }}/">收藏</a>
             </button>
         {% endif %}
-        <form name="LeaveComment" action="/comment/leave_comment/{{ goods.id }}/" method="post">
-            {% csrf_token %}
-            评论标题:{{ form.title }}
-            <br/>
-            <p>
-                评论内容:
-            </p>
-            {{ form.content }}
-            <button type="submit">确定</button>
-        </form>
+        {% if bought %}
+            <form name="LeaveComment" action="/comment/leave_comment/{{ goods.id }}/" method="post">
+                {% csrf_token %}
+                评论标题:{{ form.title }}
+                <br/>
+                <p>
+                    评论内容:
+                </p>
+                {{ form.content }}
+                <button type="submit">确定</button>
+            </form>
+        {% else %}
+            <p style="color: #ffb53a">购买后可评论</p>
+        {% endif %}
     {% endif %}
 {% elif goods.status == 'off' %}
     <p style="color: indianred">该商品已下架</p>
