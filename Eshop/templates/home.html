@@ -13,7 +13,7 @@
     <p style="text-align:right">
         <a href="/user/logout/">登出</a>
         <a href="/user/mine/">我的</a>
-        <img src="{{ image.url }}" alt="无法显示" height="48" width="48"/>
+        <img src="{{ image.url }}" alt="无法显示" height="48" width="48" class="img-circle"/>
     </p>
     <form name="SearchGoods" method="post" action="/trade/search/"
           enctype="multipart/form-data">
@@ -59,18 +59,12 @@
     {% endfor %}
     </tbody>
 </table>
-<ul id="pager">
-    {#上一页按钮开始#}
-    {# 如果当前页有上一页#}
+<ul id="pager" class="pagination">
     {% if page_goods.has_previous %}
-        {#  当前页的上一页按钮正常使用#}
         <li class="previous"><a href="/?page={{ page_goods.previous_page_number }}">上一页</a></li>
     {% else %}
-        {# 当前页的不存在上一页时,上一页的按钮不可用#}
         <li class="previous disabled"><a href="#">上一页</a></li>
     {% endif %}
-    {#上一页按钮结束#}
-    {# 页码开始#}
     {% for num in paginator.page_range %}
         {% if num == now_page %}
             <li class="item active"><a href="/?page={{ num }}">{{ num }}</a></li>
@@ -78,14 +72,11 @@
             <li class="item"><a href="/?page={{ num }}">{{ num }}</a></li>
         {% endif %}
     {% endfor %}
-    {#页码结束#}
-    {# 下一页按钮开始#}
     {% if page_goods.has_next %}
         <li class="next"><a href="/?page={{ page_goods.next_page_number }}">下一页</a></li>
     {% else %}
         <li class="next disabled"><a href="#">下一页</a></li>
     {% endif %}
-    {# 下一页按钮结束#}
 </ul>
 </body>
 </html>

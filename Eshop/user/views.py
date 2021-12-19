@@ -28,7 +28,7 @@ def check(l_s):  # 传入被检测字符串列表
 
 
 def home(req):
-    goods_list = Goods.objects.all()
+    goods_list = Goods.objects.filter(status='on').order_by('-date')
     paginator = Paginator(goods_list, 2)
     page_num = int(req.GET.get('page', 1))
     page_goods = paginator.get_page(page_num)
@@ -70,6 +70,8 @@ def send_again(req, username, label='register'):
 def register(req, role):
     form = UserReg()
     data = {'form': form}
+    if role in ['seller', 'buyer']:
+        data.update({'role': role})
     if req.method == 'POST':
         uf = UserReg(req.POST)
         if uf.is_valid():

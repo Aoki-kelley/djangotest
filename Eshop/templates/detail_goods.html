@@ -12,7 +12,7 @@
     <a href="/user/logout/">登出</a>
     <a href="/user/mine/">我的</a>
     <a href="/">返回主页</a>
-    <img src="{{ user.image.url }}" alt="无法显示" height="48" width="48"/>
+    <img src="{{ user.image.url }}" alt="无法显示" height="48" width="48" class="img-circle"/>
 </p>
 <p>
     <img src="{{ goods.image.url }}" alt="无法显示" height="120" width="74.2">
@@ -73,7 +73,7 @@
                 <td>评论者</td>
                 <td>标题</td>
                 <td>时间</td>
-                {% if user.role == 'seller' and user.id == goods.seller.id %}
+                {% if user.role == 'seller' and user.id == goods.seller.id or user.role == 'buyer' and 'bought' %}
                     <td></td>
                 {% endif %}
             </tr>
@@ -85,7 +85,7 @@
                 </td>
                 <td>{{ comment.title }}</td>
                 <td width="150">{{ comment.date|date:'Y-m-d H:i' }}</td>
-                {% if user.role == 'seller' and user.id == goods.seller.id %}
+                {% if user.role == 'seller' and user.id == goods.seller.id or user.role == 'buyer' and 'bought'%}
                     <td width="45"><a href="/comment/comment_detail/{{ comment.id }}/">查看</a></td>
                 {% endif %}
             </tr>

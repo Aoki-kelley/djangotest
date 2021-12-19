@@ -27,7 +27,7 @@ def is_signed_int(s):  # str s
         return True
 
 
-def mien_goods(req):
+def mine_goods(req):
     username = req.COOKIES.get('is_login')
     target = User.objects.filter(username__exact=username, status='on', role='seller')
     if username is not None and target:
@@ -68,7 +68,7 @@ def goods_create(req):  # 商品创建
                     ext = image.name.split(".")[-1].lower()
                     image.name = str(last_goods.id + 1) + '.' + ext
                 lb = labels[int(label) - 1][1]
-                if 0 < float(price) <= 999999 and len((str(price).split('.')[1])) <= 2:
+                if 0 < float(price) <= 999999 and len((str(float(price)).split('.')[1])) <= 2:
                     Goods.objects.create(image=image, title=title, detail=detail, label=lb,
                                          price=price, amount=amount, date=date_now, seller_id=user.id)
                     return redirect('/trade/mine_goods/')
@@ -86,7 +86,7 @@ def goods_create(req):  # 商品创建
 
 
 def change_goods(req, gid):
-    if not gid.isdigit():
+    if not str(gid).isdigit():
         return raise_wrong(req)
     else:
         username = req.COOKIES.get('is_login')
@@ -98,7 +98,7 @@ def change_goods(req, gid):
                 amount = req.POST.get('amount')
                 goods = target[0]
                 if price:
-                    if 0 < float(price) <= 999999 and len((str(price).split('.')[1])) <= 2:
+                    if 0 < float(price) <= 999999 and len((str(float(price)).split('.')[1])) <= 2:
                         goods.price = price
                         goods.save()
                     else:
@@ -127,7 +127,7 @@ def change_goods(req, gid):
 
 
 def down_goods(req, gid):
-    if not gid.isdigit():
+    if not str(gid).isdigit():
         return raise_wrong(req)
     else:
         username = req.COOKIES.get('is_login')
@@ -146,7 +146,7 @@ def down_goods(req, gid):
 
 
 def up_goods(req, gid):
-    if not gid.isdigit():
+    if not str(gid).isdigit():
         return raise_wrong(req)
     else:
         username = req.COOKIES.get('is_login')
@@ -165,7 +165,7 @@ def up_goods(req, gid):
 
 
 def goods_detail(req, gid):
-    if not gid.isdigit():
+    if not str(gid).isdigit():
         return raise_wrong(req)
     else:
         username = req.COOKIES.get('is_login')
@@ -194,7 +194,7 @@ def goods_detail(req, gid):
 
 
 def wish(req, gid):
-    if not gid.isdigit():
+    if not str(gid).isdigit():
         return raise_wrong(req)
     else:
         username = req.COOKIES.get('is_login')
@@ -234,7 +234,7 @@ def mine_wish(req):
 
 
 def order(req, gid):
-    if not gid.isdigit():
+    if not str(gid).isdigit():
         return raise_wrong(req)
     else:
         username = req.COOKIES.get('is_login')
@@ -309,7 +309,7 @@ def mine_order(req):
             for od in orders:
                 goods = Goods.objects.filter(id=od.goods)[0]
                 data['order_list'].append((goods, od))
-                return render(req, 'mine_order.html', data)
+            return render(req, 'mine_order.html', data)
     else:
         data = {'login_no': 'login_no', 'form': UserLog()}
         return render(req, 'login.html', data)
