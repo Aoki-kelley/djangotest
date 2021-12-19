@@ -4,9 +4,9 @@
 
 ## 项目：电商平台([Eshop](https://github.com/Aoki-kelley/djangotest/tree/eshop))
 
-*utf-8,python3.9*
+*utf-8,python 3.9.7*
 
-*基于django*
+*基于django 3.2.8*
 
 - 用户(买家) [^buyer]
 
@@ -16,7 +16,7 @@
 
 ​		2.可查看，收藏，下单，评论商品，回复商品的评论和回复
 
-​		3.可取消卖家未处理的订单，或结束卖家结束的订单
+​		3.可取消卖家未处理的订单[^order.status=b_cancel]，或结束卖家结束的订单
 
 - 用户(卖家)[^seller]
 
@@ -26,7 +26,7 @@
 
 ​		2.可创建，上架，下架商品，回复评论和回复，不同卖家只能查看其他卖家的商品
 
-​		3.可接受和拒绝用户的订单
+​		3.可接受和拒绝[^order.status=s_cancel]用户的订单
 
 - 商品[^goods]
 
